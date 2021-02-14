@@ -1,8 +1,8 @@
 {
   "name": "video-sorter",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "debug": "ndb nodemon src/index.js",
+    "debug": "ndb ./src/server.js",
     "benchmark": "LOG_VOID=true node benchmark.js",
     "start": "nodemon | pino-pretty",
     "test": "tape src/*.test.js"
