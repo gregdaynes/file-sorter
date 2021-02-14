@@ -103,4 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
+ingest/*
 db.dev
+store
+ingest
