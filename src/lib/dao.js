@@ -3,12 +3,23 @@ const sqlite3 = require('sqlite3').verbose()
 
 const { DATABASE_PATH } = require('lib/env')
 
-function DAO () {
+let dbConn
+
+function establishConnection () {
+  // return connection if it is already established
+  if (dbConn) return dbConn
+
   const db = new sqlite3.Database(DATABASE_PATH, (err) => {
     if (err) throw new Error('Could not connect to database', err)
-
-    log.debug('connected to database')
   })
+
+  if (DATABASE_PATH === ':memory:') dbConn = db
+
+  return db
+}
+
+function DAO () {
+  const db = establishConnection()
 
   return {
     db,
