@@ -18,22 +18,26 @@ async function analyze () {
 
   const promises = []
   for (const file of await files) {
-    const [dates, name] = findDate(file.name)
+    const [date, name] = findDate(file.name)
     const parsedName = parseName(name)
 
-    const tagsPromise = createTags(dates, parsedName, tagRepo)
-      .then((tags) => associateTags(file, tags, fileTagRepo))
+    const tags = [date, ...parsedName]
+      .filter(Boolean)
+      .map((tag) => {
+        return tagRepo.create({ tag })
+          .then((tag) => fileTagRepo.create({ file: file.id, tag: tag.id }))
+      })
 
-    const processedPromise = fileRepo.setProcessed(file.id)
+    const processed = fileRepo.setProcessed(file.id)
 
-    promises.push(tagsPromise, processedPromise)
+    promises.push(tags, processed)
   }
 
-  return Promise.all(promises)
+  return Promise.all(promises.flat())
 }
 
 function findDate (name) {
-  const date = name.match(/(\d{2}\.+){2}(\d{2})/g)
+  const date = name.match(/(?<=\.)(\d{2}\.+){2}(\d{2})/g)
 
   if (!date) return [undefined, name]
 
@@ -55,9 +59,10 @@ function parseDate (date) {
 
 function parseName (name) {
   return name
-    .replaceAll(/[.\s]/g, '|')
+    .toLowerCase()
+    .replaceAll(/[\.\s]/g, '|')
     .split('|')
-    .filter(Boolean)
+    .filter((tag) => tag != '-')
 }
 
 function createTags (dates = [], names = [], tagRepo) {
