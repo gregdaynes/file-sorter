@@ -54,6 +54,23 @@ function fileRepository (dao) {
 
       return aggregateFile(files)
     },
+
+    async getByTag (tag) {
+      const files = await dao.all(`
+        SELECT
+          files.id id,
+          files.name name,
+          files.path path,
+          json_object('id', tags.id, 'tag', tags.tag) tag
+        FROM files
+        JOIN file_tags ON files.id = file_tags.file
+        JOIN tags ON file_tags.tag = tags.id
+        WHERE tags.tag = ?
+        `,
+      [tag],
+      )
+
+      return Object.values(aggregateFiles(files))
     },
 
     async getAll () {

@@ -31,6 +31,12 @@ app.get('/files', async (req, res) => {
   res.json({ data: { files } })
 })
 
+app.get('/files/tagged/:tag', async (req, res) => {
+  const files = await fileRepo.getByTag(req.params.tag)
+
+  res.json({ data: { files } })
+})
+
 app.get('/files/:fileId', async (req, res) => {
   const file = await fileRepo.getById(req.params.fileId)
 
