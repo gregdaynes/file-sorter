@@ -1,5 +1,7 @@
 const log = require('lib/log')
+const _ = require('lodash')
 const app = require('express')()
+const bodyParser = require('body-parser')
 const { PORT } = require('lib/env')
 
 const dao = require('lib/dao')()
@@ -23,6 +25,28 @@ app.get('/tags/:tag', async (req, res) => {
   } else {
     tag = await tagRepo.getByTag(tagParam)
   }
+
+  res.json({ data: { tag } })
+})
+
+app.put('/tags/:tag', bodyParser.json(), async (req, res) => {
+  const tagParam = req.params.tag
+
+  let tag
+  if (Number(tagParam)) {
+    tag = await tagRepo.getById(tagParam)
+  } else {
+    tag = await tagRepo.getByTag(tagParam)
+  }
+
+  const newValues = {
+    ...tag,
+    ...(_.pick(req.body, ['tag', 'type'])),
+  }
+
+  await tagRepo.update(tag.id, newValues)
+
+  tag = await tagRepo.getById(tag.id)
 
   res.json({ data: { tag } })
 })
