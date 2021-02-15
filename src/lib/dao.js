@@ -1,5 +1,6 @@
 const log = require('lib/log')
 const sqlite3 = require('sqlite3').verbose()
+const _ = require('lodash')
 
 const { DATABASE_PATH } = require('lib/env')
 
@@ -62,6 +63,12 @@ function DAO () {
           return resolve(rows)
         })
       })
+    },
+
+    serialize (keys) {
+      return function serialize (data) {
+        return _.pick(data, keys)
+      }
     },
   }
 }
