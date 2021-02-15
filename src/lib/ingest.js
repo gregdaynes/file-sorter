@@ -32,7 +32,7 @@ async function ingest () {
     // move the file
     fs.rename(srcPath, destPath)
       .then(() => log.info('File moved', { srcPath, destPath, recordId }))
-      .catch(err => {
+      .catch((err) => {
         log.error('Error moving ingest file', { err, srcPath, destPath, recordId })
       })
 
