@@ -39,6 +39,7 @@ async function ingest () {
 
     // update the database
     repo.update(recordId, { name: destFile.orig, path: destPath })
+      .catch((err) => log.error('Error updating file', { err, srcPath, destPath, recordId }))
   }
 }
 
