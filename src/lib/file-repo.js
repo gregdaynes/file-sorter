@@ -52,13 +52,8 @@ function fileRepository (dao) {
       [id],
       )
 
-      return files
-        .reduce((acc, file) => ({
-          id: file.id,
-          name: file.name,
-          path: file.path,
-          tags: (acc.tags || []).concat(JSON.parse(file.tag)),
-        }))
+      return aggregateFile(files)
+    },
     },
 
     async getAll () {
@@ -74,22 +69,7 @@ function fileRepository (dao) {
         `,
       )
 
-      const aggregateFiles = files
-        .reduce((acc, file) => {
-          const obj = acc[file.id] || {
-            id: file.id,
-            name: file.name,
-            path: file.path,
-            tags: [],
-          }
-
-          obj.tags.push(JSON.parse(file.tag))
-
-          acc[file.id] = obj
-          return acc
-        }, {})
-
-      return Object.values(aggregateFiles)
+      return Object.values(aggregateFiles(files))
     },
 
     getUnprocessed () {
@@ -107,4 +87,31 @@ function fileRepository (dao) {
       )
     },
   }
+}
+
+function aggregateFile (file) {
+  return file
+    .reduce((acc, file) => ({
+      id: file.id,
+      name: file.name,
+      path: file.path,
+      tags: (acc.tags || []).concat(JSON.parse(file.tag)),
+    }))
+}
+
+function aggregateFiles (files) {
+  return files
+    .reduce((acc, file) => {
+      const obj = acc[file.id] || {
+        id: file.id,
+        name: file.name,
+        path: file.path,
+        tags: [],
+      }
+
+      obj.tags.push(JSON.parse(file.tag))
+
+      acc[file.id] = obj
+      return acc
+    }, {})
 }
