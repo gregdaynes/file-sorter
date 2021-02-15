@@ -4,6 +4,7 @@ const path = require('path')
 const mkdirp = require('mkdirp')
 const dao = require('lib/dao')
 const fileRepo = require('lib/file-repo')
+const utils = require('lib/utils')
 
 const { INGEST_PATH, STORE_PATH } = require('lib/env')
 
@@ -19,7 +20,7 @@ async function ingest () {
 
   for (const fileName of await files) {
     // setup destination for file
-    const letterIndex = fileName.match(/\w/g)[0]
+    const letterIndex = fileName.match(/\w/g)[0].toLowerCase()
     const destStore = getCreateDir(path.resolve(storePath, letterIndex))
 
     const srcPath = path.resolve(ingestPath, fileName)
@@ -59,8 +60,6 @@ function createDestPath (destStore, filename) {
 
   if (!pathExists(destFile)) return { ...parsedDestPath, orig: parsedDestPath.name }
 
-  // generate random suffix
-  const random = Number(process.hrtime().join('')).toString(36)
   const { root, dir, ext, name } = parsedDestPath
 
   return {
@@ -68,7 +67,7 @@ function createDestPath (destStore, filename) {
     dir,
     ext,
     orig: name,
-    name: `${name}-${random}`,
+    name: `${name}-${utils.random()}`,
   }
 }
 
