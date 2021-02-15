@@ -6,24 +6,31 @@ function tagRepository (dao) {
       return dao.run(
         `CREATE TABLE IF NOT EXISTS tags (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tag TEXT,
+            tag TEXT UNIQUE,
+            type TEXT,
             created_date DATETIME,
             deleted_date DATETIME
           )`,
       )
     },
 
-    create ({ tag }) {
-      return dao.run(
-        'INSERT INTO tags (tag, created_date, deleted_date) VALUES (?, ?, ?)',
+    // createOrReturn
+    async create ({ tag }) {
+      await dao.run(
+        'INSERT OR IGNORE INTO tags (tag, created_date, deleted_date) VALUES (?, ?, ?)',
         [tag, Date(), null],
+      )
+
+      return dao.get(
+        'SELECT id FROM tags WHERE tag = ?',
+        [tag],
       )
     },
 
-    update (id, { tag }) {
+    update (id, { tag, type }) {
       return dao.run(
-        'UPDATE tags SET tag = ? WHERE id = ?',
-        [tag, id],
+        'UPDATE tags SET tag = ?, type = ? WHERE id = ?',
+        [tag, type, id],
       )
     },
 
