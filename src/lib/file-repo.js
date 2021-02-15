@@ -1,20 +1,19 @@
+const _ = require('lodash')
 module.exports = fileRepository
 
 function fileRepository (dao) {
   return {
     createTable () {
-      const sql = `
-        CREATE TABLE IF NOT EXISTS files (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT,
-          path TEXT,
-          created_date DATETIME,
-          deleted_date DATETIME,
-          processed_date DATETIME
-        )
-      `
-
-      return dao.run(sql)
+      return dao.run(
+        `CREATE TABLE IF NOT EXISTS files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            path TEXT,
+            created_date DATETIME,
+            deleted_date DATETIME,
+            processed_date DATETIME
+          )`,
+      )
     },
 
     create ({ name, path }) {
@@ -38,15 +37,60 @@ function fileRepository (dao) {
       )
     },
 
-    getById (id) {
-      return dao.get(
-        'SELECT * FROM files WHERE id = ?',
-        [id],
+    async getById (id) {
+      const files = await dao.all(`
+        SELECT
+          files.id id,
+          files.name name,
+          files.path path,
+          json_object('id', tags.id, 'tag', tags.tag) tag
+        FROM files
+        JOIN file_tags ON files.id = file_tags.file
+        JOIN tags ON file_tags.tag = tags.id
+        WHERE files.id = ?
+        `,
+      [id],
       )
+
+      return files
+        .reduce((acc, file) => ({
+          id: file.id,
+          name: file.name,
+          path: file.path,
+          tags: (acc.tags || []).concat(JSON.parse(file.tag)),
+        }))
     },
 
-    getAll () {
-      return dao.all('SELECT * FROM files')
+    async getAll () {
+      const files = await dao.all(`
+         SELECT
+           files.id id,
+           files.name name,
+           files.path path,
+          json_object('id', tags.id, 'tag', tags.tag) tag
+         FROM files
+         JOIN file_tags ON files.id = file_tags.file
+         JOIN tags ON file_tags.tag = tags.id
+        `,
+      )
+
+      const aggregateFiles = files
+        .reduce((acc, file) => {
+          const obj = acc[file.id] || {
+            id: file.id,
+            name: file.name,
+            path: file.path,
+            tags: [],
+          }
+
+          obj.tags.push(JSON.parse(file.tag))
+
+          acc[file.id] = obj
+          return acc
+        }, {})
+
+      return Object.values(aggregateFiles)
+    },
     },
   }
 }
