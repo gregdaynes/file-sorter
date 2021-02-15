@@ -6,7 +6,8 @@
     "benchmark": "LOG_VOID=true node benchmark.js",
     "start": "nodemon --use-strict | pino-pretty",
     "test": "tape src/*.test.js",
-    "db:setup": "node --use-strict ./migration.js && node --use-strict ./seed.js"
+    "db:setup": "node --use-strict ./migration.js && node --use-strict ./seed.js",
+    "repl": "nodemon --use-strict repl.js | pino-pretty"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
