@@ -1,49 +1,54 @@
 const _ = require('lodash')
-const dao = require('lib/dao')
-const fileRepo = require('lib/file-repo')(dao())
-const tagRepo = require('lib/tag-repo')(dao())
-const fileTagRepo = require('lib/file-tag-repo')(dao())
+const dao = require('lib/dao')()
+const fileRepo = require('lib/file-repo')(dao)
 const utils = require('lib/utils')
+const ingest = require('lib/ingest-service')
+const analyze = require('lib/analyze-service')
 
-const files = Promise.all([
-  fileRepo.create({ name: 'test1', path: '/test/path1' }),
-  fileRepo.create({ name: 'test2', path: '/test/path2' }),
-  fileRepo.create({ name: 'test3', path: '/test/path3' }),
-  fileRepo.create({ name: 'test4', path: '/test/path4' }),
-  fileRepo.create({ name: 'test5', path: '/test/path5' }),
-])
+dropTables()
+  .then(() => createFiles())
+  .then(() => ingest())
+  .then(() => analyze())
 
-const tags = Promise.all([
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-  tagRepo.create({ tag: utils.random() }),
-])
+function dropTables () {
+  return Promise.all([
+    dao.run('DELETE FROM files'),
+    dao.run('DELETE FROM tags'),
+    dao.run('DELETE FROM file_tags'),
+  ]).then(() => dao.run('VACUUM'))
+}
 
-Promise.all([files, tags])
-  .then(([files, tags]) => associateFileTags(files, tags))
-
-function associateFileTags (files, tags) {
-  const groupedTags = _.chunk(tags, tags.length / files.length)
-  const fileTags = _.zip(files, groupedTags)
-
-  const associations = fileTags
-    .flatMap(([fileId, tagIds]) => {
-      return tagIds.map((tagId) => {
-        return {
-          file: fileId,
-          tag: tagId,
-        }
-      })
-    })
-
-  associations.forEach((association) => {
-    fileTagRepo.create(association)
-  })
+function createFiles () {
+  return Promise.all([
+    [
+      `date-test.22.01.10.${utils.random()}`,
+      `date-test.21.12.25.${utils.random()}`,
+      `date-test.22.01.03.${utils.random()}`,
+      `date-test.22.01.07.${utils.random()}`,
+      `date-test.22.01.13.${utils.random()}`,
+      `date-test.21.02.07.${utils.random()}`,
+      `date-test.22.02.06.${utils.random()}`,
+      `date-test.22.01.26.${utils.random()}`,
+      `date-test.22.02.01.${utils.random()}`,
+      `date-test.21.12.29.${utils.random()}`,
+      `date-test.22.02.11.${utils.random()}`,
+      `date-test.22.02.05.${utils.random()}`,
+      `date-test.22.01.01.${utils.random()}`,
+      `date-test.22.02.06.${utils.random()}`,
+      `date-test.21.12.08.${utils.random()}`,
+      `date-test.22.01.22.${utils.random()}`,
+      `date-test.22.01.28.${utils.random()}`,
+      `date-test.22.02.06.${utils.random()}`,
+      `date-test.22.02.12.${utils.random()}`,
+      `date-test.22.01.02.${utils.random()}`,
+      `date-test.22.01.01.${utils.random()}`,
+      `date-test.22.02.05.${utils.random()}`,
+      `date-test.21.12.22.${utils.random()}`,
+      `date-test.22.01.24.${utils.random()}`,
+      `date-test.22.02.05.${utils.random()}`,
+      `date-test.20.11.26.${utils.random()}`,
+    ].forEach((name) => {
+      fileRepo.create({ name, path: '' })
+    }),
+  ])
 }
