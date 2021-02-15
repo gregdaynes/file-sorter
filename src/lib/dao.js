@@ -18,11 +18,11 @@ function DAO () {
         // callback is bound to run which has { lastID, changes }
         db.run(sql, params, function (err) {
           if (err) {
-            log.error('Error running sql:', sql)
+            log.error('Error running sql:', err)
             return reject(err)
           }
 
-          return resolve(this.lastID)
+          resolve(this.lastID)
         })
       })
     },
@@ -47,6 +47,7 @@ function DAO () {
             log.error('Error running sql:', sql)
             return reject(err)
           }
+
           return resolve(rows)
         })
       })
