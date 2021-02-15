@@ -12,6 +12,19 @@ app.get('/tags', async (req, res) => {
   res.json({ data: { tags } })
 })
 
+app.get('/tags/:tag', async (req, res) => {
+  const tagParam = req.params.tag
+
+  let tag
+  if (Number(tagParam)) {
+    tag = await tagRepo.getById(tagParam)
+  } else {
+    tag = await tagRepo.getByTag(tagParam)
+  }
+
+  res.json({ data: { tag } })
+})
+
 app.get('/files', async (req, res) => {
   const files = await fileRepo.getAll()
 

@@ -48,6 +48,13 @@ function tagRepository (dao) {
       )
     },
 
+    getByTag (tag) {
+      return dao.get(
+        'SELECT id, tag, type FROM tags WHERE tag = ?',
+        [tag],
+      )
+    },
+
     getAll () {
       return dao.all('SELECT id, tag, type FROM tags')
     },
