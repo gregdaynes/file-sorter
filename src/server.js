@@ -6,6 +6,8 @@ const dao = require('lib/dao')()
 const tagRepo = require('lib/tag-repo')(dao)
 const fileRepo = require('lib/file-repo')(dao)
 
+const streamFile = require('lib/stream-file')
+
 app.get('/tags', async (req, res) => {
   const tags = await tagRepo.getAll()
 
@@ -38,6 +40,9 @@ app.get('/files/tagged/:tag', async (req, res) => {
 
   res.json({ data: { files } })
 })
+
+app.get('/files/:fileId/watch', streamFile)
+app.get('/files/:fileId/stream', streamFile)
 
 app.get('/files/:fileId', async (req, res) => {
   const file = await fileRepo.getById(req.params.fileId)
