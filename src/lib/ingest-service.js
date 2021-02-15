@@ -14,11 +14,14 @@ const storePath = getCreateDir(path.resolve(STORE_PATH))
 module.exports = ingest
 
 async function ingest () {
+  log.debug('funning ingesting')
+
   const repo = fileRepo(dao())
 
   const files = dirList(ingestPath)
 
   for (const fileName of await files) {
+    log.debug('ingesting', fileName)
     // setup destination for file
     const letterIndex = fileName.match(/\w/g)[0].toLowerCase()
     const destStore = getCreateDir(path.resolve(storePath, letterIndex))
@@ -71,5 +74,3 @@ function createDestPath (destStore, filename) {
     name: `${name}-${utils.random()}`,
   }
 }
-
-ingest()
