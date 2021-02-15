@@ -45,8 +45,8 @@ function fileRepository (dao) {
           files.path path,
           json_object('id', tags.id, 'tag', tags.tag) tag
         FROM files
-        JOIN file_tags ON files.id = file_tags.file
-        JOIN tags ON file_tags.tag = tags.id
+        LEFT JOIN file_tags ON files.id = file_tags.file
+        LEFT JOIN tags ON file_tags.tag = tags.id
         WHERE files.id = ?
         `,
       [id],
@@ -63,8 +63,8 @@ function fileRepository (dao) {
           files.path path,
           json_object('id', tags.id, 'tag', tags.tag) tag
         FROM files
-        JOIN file_tags ON files.id = file_tags.file
-        JOIN tags ON file_tags.tag = tags.id
+        LEFT JOIN file_tags ON files.id = file_tags.file
+        LEFT JOIN tags ON file_tags.tag = tags.id
         WHERE tags.tag = ?
         `,
       [tag],
@@ -81,8 +81,8 @@ function fileRepository (dao) {
            files.path path,
           json_object('id', tags.id, 'tag', tags.tag) tag
          FROM files
-         JOIN file_tags ON files.id = file_tags.file
-         JOIN tags ON file_tags.tag = tags.id
+         LEFT JOIN file_tags ON files.id = file_tags.file
+         LEFT JOIN tags ON file_tags.tag = tags.id
         `,
       )
 
