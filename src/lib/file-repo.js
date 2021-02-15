@@ -91,6 +91,20 @@ function fileRepository (dao) {
 
       return Object.values(aggregateFiles)
     },
+
+    getUnprocessed () {
+      return dao.all(`
+        SELECT *
+        FROM files
+        WHERE processed_date IS NULL
+      `)
+    },
+
+    setProcessed (id) {
+      return dao.run(
+        'UPDATE files SET processed_date = ? WHERE id = ?',
+        [Date(), id],
+      )
     },
   }
 }
