@@ -2,7 +2,15 @@ const _ = require('lodash')
 module.exports = fileRepository
 
 function fileRepository (dao) {
+  const serialize = dao.serialize([
+    'id',
+    'name',
+    'tags',
+  ])
+
   return {
+    serialize,
+
     createTable () {
       return dao.run(
         `CREATE TABLE IF NOT EXISTS files (
@@ -38,7 +46,9 @@ function fileRepository (dao) {
     },
 
     async getById (id) {
-      const files = await dao.all(`
+      // fileArr is an array of the query below
+      // file data is duplicate, tags are different
+      const fileArr = await dao.all(`
         SELECT
           files.id id,
           files.name name,
@@ -52,7 +62,9 @@ function fileRepository (dao) {
       [id],
       )
 
-      return aggregateFile(files)
+      if (!fileArr.length) return []
+
+      return aggregateFile(fileArr)
     },
 
     async getByTag (tag) {
@@ -109,9 +121,7 @@ function fileRepository (dao) {
 function aggregateFile (file) {
   return file
     .reduce((acc, file) => ({
-      id: file.id,
-      name: file.name,
-      path: file.path,
+      ...file,
       tags: (acc.tags || []).concat(JSON.parse(file.tag)),
     }))
 }
@@ -120,9 +130,7 @@ function aggregateFiles (files) {
   return files
     .reduce((acc, file) => {
       const obj = acc[file.id] || {
-        id: file.id,
-        name: file.name,
-        path: file.path,
+        ...file,
         tags: [],
       }
 

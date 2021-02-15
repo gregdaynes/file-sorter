@@ -28,7 +28,9 @@ app.get('/tags/:tag', async (req, res) => {
 app.get('/files', async (req, res) => {
   const files = await fileRepo.getAll()
 
-  res.json({ data: { files } })
+  const data = files.map((file) => fileRepo.serialize(file))
+
+  res.json({ data: { files: data } })
 })
 
 app.get('/files/tagged/:tag', async (req, res) => {
@@ -39,8 +41,9 @@ app.get('/files/tagged/:tag', async (req, res) => {
 
 app.get('/files/:fileId', async (req, res) => {
   const file = await fileRepo.getById(req.params.fileId)
+  const data = fileRepo.serialize(file)
 
-  res.json({ data: { file } })
+  res.json({ data: { file: data } })
 })
 
 app.listen(PORT, log.info.bind(null, `Running on port ${PORT}`))
