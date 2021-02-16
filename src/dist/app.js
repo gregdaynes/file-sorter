@@ -2,6 +2,25 @@
 
 const eventBus = new Vue()
 
+Vue.component('navbar', {
+  template: `
+    <nav class="navbar">
+      <button @click="ingest()">Ingest</button>
+      <button @click="analyze()">Analyze</button>
+    </nav>
+  `,
+
+  methods: {
+    ingest () {
+      return fetch('/ingest')
+    },
+
+    analyze () {
+      return fetch('/analyze')
+    },
+  },
+})
+
 Vue.component('tags-list', {
   template: `
     <div class="tag-list">
@@ -180,6 +199,8 @@ new Vue({
   el: '#app',
   template: `
     <div id="app-container">
+      <navbar />
+
       <div class="frame-wrapper">
         <tags-list />
         <file-list />

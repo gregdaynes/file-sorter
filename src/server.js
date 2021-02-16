@@ -4,6 +4,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const { PORT, DIST_PATH } = require('lib/env')
+const ingestService = require('lib/ingest-service')
+const analyzeService = require('lib/analyze-service')
 
 const app = express()
 const dao = require('lib/dao')()
@@ -81,6 +83,18 @@ app.get('/files/:fileId', async (req, res) => {
 
 app.delete('/files/:fileId', async (req, res) => {
   await fileRepo.delete(req.params.fileId)
+
+  res.json({ data: { success: true } })
+})
+
+app.get('/ingest', async (req, res) => {
+  await ingestService()
+
+  res.json({ data: { success: true } })
+})
+
+app.get('/analyze', async (req, res) => {
+  await analyzeService()
 
   res.json({ data: { success: true } })
 })
