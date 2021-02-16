@@ -58,6 +58,7 @@ function fileRepository (dao) {
         LEFT JOIN file_tags ON files.id = file_tags.file
         LEFT JOIN tags ON file_tags.tag = tags.id
         WHERE files.id = ?
+          AND files.deleted_date IS NULL
         `,
       [id],
       )
@@ -78,6 +79,7 @@ function fileRepository (dao) {
         LEFT JOIN file_tags ON files.id = file_tags.file
         LEFT JOIN tags ON file_tags.tag = tags.id
         WHERE tags.tag = ?
+          AND files.deleted_date IS NULL
         `,
       [tag],
       )
@@ -95,6 +97,7 @@ function fileRepository (dao) {
          FROM files
          LEFT JOIN file_tags ON files.id = file_tags.file
          LEFT JOIN tags ON file_tags.tag = tags.id
+         WHERE files.deleted_date IS NULL
         `,
       )
 
@@ -106,6 +109,7 @@ function fileRepository (dao) {
         SELECT *
         FROM files
         WHERE processed_date IS NULL
+          AND deleted_date IS NULL
       `)
     },
 
