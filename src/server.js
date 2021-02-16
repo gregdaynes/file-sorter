@@ -79,6 +79,12 @@ app.get('/files/:fileId', async (req, res) => {
   res.json({ data: { file: data } })
 })
 
+app.delete('/files/:fileId', async (req, res) => {
+  await fileRepo.delete(req.params.fileId)
+
+  res.json({ data: { success: true } })
+})
+
 app.all('*', express.static(distPath), (req, res) => {
   res.sendFile(path.resolve(distPath, 'index.html'))
 })
