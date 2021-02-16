@@ -1,4 +1,3 @@
-const log = require('lib/log')
 const dateFns = require('date-fns')
 
 const Dao = require('lib/dao')
@@ -60,21 +59,8 @@ function parseDate (date) {
 function parseName (name) {
   return name
     .toLowerCase()
-    .replaceAll(/[\.\s]/g, '|')
+    .replaceAll(/[.\s('\s)]/g, '|')
     .split('|')
-    .filter((tag) => tag != '-')
-}
-
-function createTags (dates = [], names = [], tagRepo) {
-  const tags = [...dates, ...names]
-    .map((tag) => tagRepo.create({ tag }))
-
-  return Promise.all(tags)
-}
-
-function associateTags (file, tags, fileTagRepo) {
-  const associations = tags
-    .map((tag) => fileTagRepo.create({ file: file.id, tag: tag.id }))
-
-  return Promise.all(associations)
+    .filter((tag) => tag !== '-')
+    .filter((tag) => !tag.includes('DUPLICATE'))
 }

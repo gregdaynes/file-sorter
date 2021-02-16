@@ -71,6 +71,6 @@ function createDestPath (destStore, filename) {
     dir,
     ext,
     orig: name,
-    name: `${name}-${utils.random()}`,
+    name: `${name}.DUPLICATE-${utils.random()}`,
   }
 }
