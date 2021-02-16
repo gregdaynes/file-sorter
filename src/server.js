@@ -1,14 +1,18 @@
 const log = require('lib/log')
 const _ = require('lodash')
-const app = require('express')()
+const express = require('express')
 const bodyParser = require('body-parser')
-const { PORT } = require('lib/env')
+const path = require('path')
+const { PORT, DIST_PATH } = require('lib/env')
 
+const app = express()
 const dao = require('lib/dao')()
 const tagRepo = require('lib/tag-repo')(dao)
 const fileRepo = require('lib/file-repo')(dao)
 
 const streamFile = require('lib/stream-file')
+
+const distPath = path.resolve(DIST_PATH)
 
 app.get('/tags', async (req, res) => {
   const tags = await tagRepo.getAll()
@@ -73,6 +77,10 @@ app.get('/files/:fileId', async (req, res) => {
   const data = fileRepo.serialize(file)
 
   res.json({ data: { file: data } })
+})
+
+app.all('*', express.static(distPath), (req, res) => {
+  res.sendFile(path.resolve(distPath, 'index.html'))
 })
 
 app.listen(PORT, log.info.bind(null, `Running on port ${PORT}`))
